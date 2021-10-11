@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+* {
+  font-family: "Roboto", sans-serif;
+}
+@layer components {
+  .topbarIconItem {
+    @apply mr-4 cursor-pointer relative hover:animate-bounce;
+  }
+  .badge {
+    @apply w-4 h-4 bg-[red] rounded-full text-white absolute top-[-5px] right-[-5px] flex items-center justify-center text-[12px];
+  }
+  .sidebaritemlist {
+    @apply flex items-center mb-5 cursor-pointer;
+  }
+  .sidebarIcon {
+    @apply mr-4;
+  }
+  .shareIcon {
+    @apply text-sm lg:text-lg mr-1;
+  }
+  .sharedOptionText {
+    @apply text-xs lg:text-sm font-semibold;
+  }
+  .messenger {
+    height: calc(100vh - theme("spacing.20"));
+  }
+}
