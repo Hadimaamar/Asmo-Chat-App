@@ -9,6 +9,14 @@ import { useContext, useRef, useState } from "react";
 import { AuthContext } from "../../src/context/AuthContext";
 import axios from "axios";
 
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+} from "firebase/storage";
+import app from "../firebase";
+
 const Share = () => {
   const { user } = useContext(AuthContext);
   const desc = useRef();
@@ -21,24 +29,59 @@ const Share = () => {
       desc: desc.current.value,
     };
     if (file) {
-      const data = new FormData();
-      const fileName = Date.now() + file.name;
-      data.append("file", file);
-      data.append("name", fileName);
-      newPost.img = fileName;
+      // const data = new FormData();
+      const filename = new Date().getTime() + file.name;
+      const storage = getStorage(app);
+      const storageRef = ref(storage, filename);
+      const uploadTask = uploadBytesResumable(storageRef, file);
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log("Upload is " + progress + "% done");
+          switch (snapshot.state) {
+            case "paused":
+              console.log("Upload is paused");
+              break;
+            case "running":
+              console.log("Upload is running");
+              break;
+            default:
+          }
+        },
+        (error) => {},
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            console.log("fownloasdasds", downloadURL);
+            newPost.img = downloadURL;
+            try {
+              axios.post("/posts", newPost);
+              newPost.img && window.location.reload();
+            } catch (error) {
+              console.log(error);
+            }
+          });
+        }
+      );
+      // data.append("file", file);
+      // data.append("name", fileName);
+      // newPost.img = fileName;
+      // try {
+      //   await axios.post("/upload", data);
+      // } catch (err) {
+      //   console.log(err);
+      // }
+    }
+    if (!file)
       try {
-        await axios.post("/upload", data);
+        await axios.post("/posts", newPost);
+        window.location.reload();
       } catch (err) {
         console.log(err);
       }
-    }
-    try {
-      await axios.post("/posts", newPost);
-      window.location.reload();
-    } catch (err) {
-      console.log(err);
-    }
   };
+  console.log(file);
   return (
     <div className="w-full  rounded-xl shadow-xl  ">
       <div className="p-3 ">

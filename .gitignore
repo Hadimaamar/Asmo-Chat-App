@@ -16,6 +16,7 @@
 
 # misc
 /api/.DS_Store
+/api/.env
 /api/.env.local
 /api/.env.development.local
 /api/.env.test.local
@@ -26,3 +27,4 @@
 /socket/npm-debug.log*
 /client/yarn-debug.log*
 /client/yarn-error.log*
+/client/src/redux
